@@ -2,6 +2,8 @@ bash
 ```
 uv run main.py
 ```
+https://youtu.be/6gLeplbqtqg?si=m0WoZor5rseNvGT1
+
 ```mermaid
 graph TD
     S[START] --> SP(Single Player)
