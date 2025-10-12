@@ -2,6 +2,7 @@ from lib.object import Object
 import pygame
 from os.path import join
 
+
 def get_block(size):
     path = join("assets", "Terrain", "Terrain.png")
     image = pygame.image.load(path).convert_alpha()

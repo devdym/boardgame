@@ -2,6 +2,7 @@ from lib.object import Object
 import pygame
 from lib.load import load_sprite_sheets
 
+
 class Fire(Object):
     ANIMATION_DELAY = 3
 

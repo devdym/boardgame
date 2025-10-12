@@ -1,13 +1,14 @@
 import pygame
 from lib.load import load_sprite_sheets
 
+
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
     ANIMATION_DELAY = 5
     SPRITES = None
 
-    def __init__(self, x, y, width, height, name, status):
+    def __init__(self, x, y, width, height, name, selected):
         super().__init__()
         self.SPRITES = load_sprite_sheets("MainCharacters", name, 32, 32, True)
         self.rect = pygame.Rect(x, y, width, height)
@@ -19,7 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.fall_count = 0
         self.hit = False
         self.hit_count = 0
-        self.status = status
+        self.selected = selected
 
     def move(self, dx, dy):
         self.rect.x += dx
@@ -66,7 +67,6 @@ class Player(pygame.sprite.Sprite):
         self.fall_count += 1
         self.update_sprite()
 
-
     def hit_head(self):
         self.count = 0
         self.y_vel *= -1
@@ -75,9 +75,9 @@ class Player(pygame.sprite.Sprite):
         sprite_sheet = "idle"
         if self.hit:
             sprite_sheet = "hit" 
-        # if self.status:
-        #     sprite_sheet = "idle_outlined"
-        
+
+        elif self.selected:
+            sprite_sheet = "outlined"
         elif self.y_vel > self.GRAVITY * 2:
             sprite_sheet = "fall"
         elif self.x_vel != 0:

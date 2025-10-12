@@ -3,12 +3,11 @@ from os.path import isfile, join
 import pygame
 from lib.outliner import Outliner
 
-WIDTH, HEIGHT = 1000, 800
 
+WIDTH, HEIGHT = 1000, 800
 
 def flip(sprites):
     return [pygame.transform.flip(sprite, True, False) for sprite in sprites]
-
 
 def load_sprite_sheets(dir1, dir2, width, height, direction=False):
     path = join("assets", dir1, dir2)
@@ -17,16 +16,23 @@ def load_sprite_sheets(dir1, dir2, width, height, direction=False):
     all_sprites = {}
 
     outliner = Outliner()
+    ol = False
 
     for image in images:
         sprite_sheet = pygame.image.load(join(path, image)).convert()
+        
+
 
         sprites = []
         for i in range(sprite_sheet.get_width() // width ):
             surface = pygame.Surface((width, height), pygame.SRCALPHA, 32)
             rect = pygame.Rect(i * width, 0, width, height)
             surface.blit(sprite_sheet, (0, 0), rect)
-            sprites.append(pygame.transform.scale2x(surface))
+            if image == 'outlined.png':
+                sprites.append(outliner.outline_surface(pygame.transform.scale2x(surface), color = 'red', outline_only=False))
+            else:
+                sprites.append(pygame.transform.scale2x(surface))
+
             
         
         if direction:
@@ -34,8 +40,6 @@ def load_sprite_sheets(dir1, dir2, width, height, direction=False):
             all_sprites[image.replace(".png", "_up")] = sprites
             all_sprites[image.replace(".png", "_down")] = sprites
             all_sprites[image.replace(".png", "_left")] = flip(sprites)
-            # all_sprites[image.replace(".png", "_outlined_right")] = outliner.outline_surface(sprites[0], color = 'black', outline_only=False)
-            # all_sprites[image.replace(".png", "_outlined_left")] = outliner.outline_surface(flip(sprites)[0], color = 'black', outline_only=False)
         else:
             all_sprites[image.replace(".png", "")] = sprites
     

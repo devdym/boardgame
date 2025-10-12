@@ -4,6 +4,7 @@ from lib.load import get_background
 from lib.block import Block
 from lib.player import Player
 
+
 pygame.init()
 pygame.display.set_caption("BoardGame")
 
@@ -51,7 +52,7 @@ def collide(player, objects, dx, dy):
     player.update()
     return collided_object 
 
-def handle_move(player, objects):
+def handle_move(player, objects, steps_player1):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
@@ -63,13 +64,18 @@ def handle_move(player, objects):
 
     if keys[pygame.K_LEFT] and not collide_left:
         player.move_left(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
     if keys[pygame.K_RIGHT] and not collide_right:
         player.move_right(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
     if keys[pygame.K_UP] and not collide_up:
         player.move_up(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
     if keys[pygame.K_DOWN] and not collide_down:
         player.move_down(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
     
+    print(f'steps_pl1 {steps_player1}')
 
     vertical_collide = handle_vertical_collision(player, objects, player.y_vel)
 
@@ -78,13 +84,12 @@ def handle_move(player, objects):
         if obj and obj.name == "fire":
             player.make_hit() 
 
-
 def main(window):
     clock = pygame.time.Clock()
     background, bg_image = get_background("Blue.png")
 
     block_size = 96
-    active_hero = None
+    active_hero = 0
 
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
@@ -92,12 +97,15 @@ def main(window):
     objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
 
-
-    player = Player(100, 100, 50, 50, "MaskDude", True)
+    player1 = Player(100, 100, 50, 50, "MaskDude", False)
     player2 = Player(100, 150, 50, 50, "NinjaFrog", False)
     player3 = Player(50, 100, 50, 50, "VirtualGuy", False)
 
-    players = [player, player2, player3]
+    players = [player1, player2, player3]
+    players[active_hero].selected = True
+
+    steps_player1 = 0
+    steps_player2 = 0
 
     offset_x = 0
     scroll_area_width = 200
@@ -106,21 +114,36 @@ def main(window):
     while run:
         clock.tick(FPS)
 
-        player.loop(FPS)
+        player1.loop(FPS)
         player2.loop(FPS)
         player3.loop(FPS)
         fire.loop()
-        handle_move(player, objects)
+
+        handle_move(players[active_hero], objects, steps_player1)
         draw(window, background, bg_image, players, objects, offset_x)
 
-        if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
-            (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
-            offset_x += player.x_vel
+        if ((player1.rect.right - offset_x >= WIDTH - scroll_area_width) and player1.x_vel > 0) or (
+            (player1.rect.left - offset_x <= scroll_area_width) and player1.x_vel < 0):
+            offset_x += player1.x_vel
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_TAB:
+                    players[active_hero].selected = False
+
+                    if active_hero < len(players)-1:
+                        active_hero = active_hero + 1
+                    else:
+                        active_hero = 0
+                    
+                    players[active_hero].selected = True
+
+                
+                    print(f'active_hero {active_hero}')
 
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
