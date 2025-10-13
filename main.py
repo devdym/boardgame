@@ -2,6 +2,7 @@ import pygame
 from lib.fire import Fire
 from lib.load import get_background
 from lib.block import Block
+from lib.hero import Hero
 from lib.player import Player
 
 
@@ -14,15 +15,18 @@ PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
-def draw(window, background, bg_image, players, objects, offset_x):
+def draw(window, background, bg_image, objects, pl1, pl2):
     for tile in background:
         window.blit(bg_image, tile)
 
     for obj in objects:
-        obj.draw(window, offset_x)
+        obj.draw(window)
 
-    for player in players:
-        player.draw(window, offset_x)
+    # for player in players.heroes:
+    #     player.draw(window, offset_x)
+
+    pl1.draw(window, 0)
+    pl2.draw(window, 0)
 
     pygame.display.update()
 
@@ -89,7 +93,6 @@ def main(window):
     background, bg_image = get_background("Blue.png")
 
     block_size = 96
-    active_hero = 0
 
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
@@ -97,53 +100,54 @@ def main(window):
     objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
 
-    player1 = Player(100, 100, 50, 50, "MaskDude", False)
-    player2 = Player(100, 150, 50, 50, "NinjaFrog", False)
-    player3 = Player(50, 100, 50, 50, "VirtualGuy", False)
+    # hero1 = Hero(100, 100, 50, 50, "MaskDude", False)
+    # hero2 = Hero(100, 150, 50, 50, "NinjaFrog", False)
+    # hero3 = Hero(50, 100, 50, 50, "VirtualGuy", False)
+    # hero4 = Hero(200, 200, 50, 50, "MaskDude", False)
 
-    players = [player1, player2, player3]
-    players[active_hero].selected = True
+    player1 = Player(100, ["MaskDude", "NinjaFrog"], FPS, window)
+    player2 = Player(100, ["VirtualGuy", "MaskDude"], FPS, window)
 
-    steps_player1 = 0
-    steps_player2 = 0
+    # heroes = [hero1, hero2, hero3, hero4]
+    # heroes[active_hero].selected = True
 
-    offset_x = 0
-    scroll_area_width = 200
+    # scroll_area_width = 200
 
     run = True
     while run:
         clock.tick(FPS)
 
-        player1.loop(FPS)
-        player2.loop(FPS)
-        player3.loop(FPS)
+        # hero1.loop(FPS)
+        # hero2.loop(FPS)
+        # hero3.loop(FPS)
+        # hero4.loop(FPS)
         fire.loop()
 
-        handle_move(players[active_hero], objects, steps_player1)
-        draw(window, background, bg_image, players, objects, offset_x)
+        # handle_move(hero1, objects, steps_player1)
+        draw(window, background, bg_image, objects, player1, player2)
 
-        if ((player1.rect.right - offset_x >= WIDTH - scroll_area_width) and player1.x_vel > 0) or (
-            (player1.rect.left - offset_x <= scroll_area_width) and player1.x_vel < 0):
-            offset_x += player1.x_vel
+        # if ((hero1.rect.right - offset_x >= WIDTH - scroll_area_width) and hero1.x_vel > 0) or (
+        #     (hero1.rect.left - offset_x <= scroll_area_width) and hero1.x_vel < 0):
+        #     offset_x += hero1.x_vel
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_TAB:
-                    players[active_hero].selected = False
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_TAB:
+            #         heroes[active_hero].selected = False
 
-                    if active_hero < len(players)-1:
-                        active_hero = active_hero + 1
-                    else:
-                        active_hero = 0
+            #         if active_hero < len(heroes)-1:
+            #             active_hero = active_hero + 1
+            #         else:
+            #             active_hero = 0
                     
-                    players[active_hero].selected = True
+            #         heroes[active_hero].selected = True
 
                 
-                    print(f'active_hero {active_hero}')
+            #         print(f'active_hero {active_hero}')
 
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
