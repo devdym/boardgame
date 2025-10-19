@@ -8,14 +8,14 @@ class Hero(pygame.sprite.Sprite):
     ANIMATION_DELAY = 5
     SPRITES = None
 
-    def __init__(self, x, y, width, height, name, selected):
+    def __init__(self, x, y, width, height, name, direction, selected):
         super().__init__()
         self.SPRITES = load_sprite_sheets("MainCharacters", name, 32, 32, True)
         self.rect = pygame.Rect(x, y, width, height)
         self.x_vel = 0
         self.y_vel = 0
         self.mask = None
-        self.direction = "left"
+        self.direction = direction
         self.animation_count = 0
         self.fall_count = 0
         self.hit = False

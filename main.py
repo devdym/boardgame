@@ -2,7 +2,6 @@ import pygame
 from lib.fire import Fire
 from lib.load import get_background
 from lib.block import Block
-from lib.hero import Hero
 from lib.player import Player
 
 
@@ -94,60 +93,54 @@ def main(window):
 
     block_size = 96
 
+
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
-    floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
-    objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),
+    # floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
+    objects = [ Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
 
-    # hero1 = Hero(100, 100, 50, 50, "MaskDude", False)
-    # hero2 = Hero(100, 150, 50, 50, "NinjaFrog", False)
-    # hero3 = Hero(50, 100, 50, 50, "VirtualGuy", False)
-    # hero4 = Hero(200, 200, 50, 50, "MaskDude", False)
 
-    player1 = Player(100, ["MaskDude", "NinjaFrog"], FPS, window)
-    player2 = Player(100, ["VirtualGuy", "MaskDude"], FPS, window)
+    player1 = Player(100, 100, ["MaskDude", "NinjaFrog"], "right", FPS, window)
+    player1_steps = 100
 
-    # heroes = [hero1, hero2, hero3, hero4]
-    # heroes[active_hero].selected = True
+    player2 = Player(100, 400, ["VirtualGuy", "MaskDude"], "left", FPS, window)
+    player2_steps = 100
 
-    # scroll_area_width = 200
+    active_player = 1
+
+
 
     run = True
     while run:
         clock.tick(FPS)
-
-        # hero1.loop(FPS)
-        # hero2.loop(FPS)
-        # hero3.loop(FPS)
-        # hero4.loop(FPS)
+        player1.heroes_list[0].loop(FPS)
+        player1.heroes_list[1].loop(FPS)
+        player2.heroes_list[0].loop(FPS)
+        player2.heroes_list[1].loop(FPS)
         fire.loop()
 
         # handle_move(hero1, objects, steps_player1)
         draw(window, background, bg_image, objects, player1, player2)
-
-        # if ((hero1.rect.right - offset_x >= WIDTH - scroll_area_width) and hero1.x_vel > 0) or (
-        #     (hero1.rect.left - offset_x <= scroll_area_width) and hero1.x_vel < 0):
-        #     offset_x += hero1.x_vel
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
 
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_TAB:
-            #         heroes[active_hero].selected = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_TAB:
+                    heroes[active_hero].selected = False
 
-            #         if active_hero < len(heroes)-1:
-            #             active_hero = active_hero + 1
-            #         else:
-            #             active_hero = 0
+                    if active_hero < len(heroes)-1:
+                        active_hero = active_hero + 1
+                    else:
+                        active_hero = 0
                     
-            #         heroes[active_hero].selected = True
+                    heroes[active_hero].selected = True
 
                 
-            #         print(f'active_hero {active_hero}')
+                    print(f'active_hero {active_hero}')
 
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
