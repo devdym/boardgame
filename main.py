@@ -100,7 +100,6 @@ def main(window):
     objects = [ Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
 
-
     player1 = Player(100, 100, ["MaskDude", "NinjaFrog"], "right", FPS, window)
     player1_steps = 100
 
@@ -108,8 +107,8 @@ def main(window):
     player2_steps = 100
 
     active_player = 1
-
-
+    # play_heroes = player1.heroes_list
+    active_hero = 0
 
     run = True
     while run:
@@ -123,24 +122,58 @@ def main(window):
         # handle_move(hero1, objects, steps_player1)
         draw(window, background, bg_image, objects, player1, player2)
 
+        play_heroes = player1.heroes_list
+        play_heroes[active_hero].selected = True
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
 
             if event.type == pygame.KEYDOWN:
+                # change hero of same player
                 if event.key == pygame.K_TAB:
-                    heroes[active_hero].selected = False
+                    play_heroes[active_hero].selected = False
+                    if active_player == 1:
+                        play_heroes = player1.heroes_list
 
-                    if active_hero < len(heroes)-1:
-                        active_hero = active_hero + 1
-                    else:
-                        active_hero = 0
+                        if active_hero < len(play_heroes)-1:
+                            active_hero = active_hero + 1
+                        else:
+                            active_hero = 0
+                            
+                        play_heroes[active_hero].selected = True
                     
-                    heroes[active_hero].selected = True
+                    if active_player == 2:
+                        play_heroes = player2.heroes_list
 
-                
-                    print(f'active_hero {active_hero}')
+                        if active_hero < len(play_heroes)-1:
+                            active_hero = active_hero + 1
+                        else:
+                            active_hero = 0
+
+                        play_heroes[active_hero].selected = True
+
+                    print(f'active hero: {active_hero}')
+                    print(f'active player: {active_player}')
+
+                # change player and activate first hero
+                if event.key == pygame.K_n:
+                    play_heroes[active_hero].selected = False
+                    active_hero = 0
+
+                    if active_player == 1:
+                        active_player = 2
+                        play_heroes = player2.heroes_list
+
+                    else:
+                        active_player = 1
+                        play_heroes = player1.heroes_list
+                    
+                    play_heroes[active_hero].selected = True
+
+
+                    print(f'Active Player {active_player}')
 
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
