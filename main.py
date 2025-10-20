@@ -55,37 +55,44 @@ def collide(player, objects, dx, dy):
     player.update()
     return collided_object 
 
-def handle_move(player, objects, steps_player1):
+def handle_move(active_player, active_hero, player1, player2, objects, steps_player1):
+    if active_player == 1:
+        play_heroes = player1.heroes_list
+    else:
+        play_heroes = player2.heroes_list
+
+    hero = play_heroes[active_hero]
+    
     keys = pygame.key.get_pressed()
 
-    player.x_vel = 0
-    player.y_vel = 0
-    collide_left = collide(player, objects, -PLAYER_VEL * 2, PLAYER_VEL * 2)
-    collide_right = collide(player, objects, PLAYER_VEL * 2, PLAYER_VEL * 2)
-    collide_up = collide(player, objects, PLAYER_VEL * 2, -PLAYER_VEL * 2)
-    collide_down = collide(player, objects, -PLAYER_VEL * 2, -PLAYER_VEL * 2)
+    hero.x_vel = 0
+    hero.y_vel = 0
+    collide_left = collide(hero, objects, -PLAYER_VEL * 2, PLAYER_VEL * 2)
+    collide_right = collide(hero, objects, PLAYER_VEL * 2, PLAYER_VEL * 2)
+    collide_up = collide(hero, objects, PLAYER_VEL * 2, -PLAYER_VEL * 2)
+    collide_down = collide(hero, objects, -PLAYER_VEL * 2, -PLAYER_VEL * 2)
 
     if keys[pygame.K_LEFT] and not collide_left:
-        player.move_left(PLAYER_VEL)
+        hero.move_left(PLAYER_VEL)
         steps_player1 = steps_player1 + 1
     if keys[pygame.K_RIGHT] and not collide_right:
-        player.move_right(PLAYER_VEL)
+        hero.move_right(PLAYER_VEL)
         steps_player1 = steps_player1 + 1
     if keys[pygame.K_UP] and not collide_up:
-        player.move_up(PLAYER_VEL)
+        hero.move_up(PLAYER_VEL)
         steps_player1 = steps_player1 + 1
     if keys[pygame.K_DOWN] and not collide_down:
-        player.move_down(PLAYER_VEL)
+        hero.move_down(PLAYER_VEL)
         steps_player1 = steps_player1 + 1
     
     print(f'steps_pl1 {steps_player1}')
 
-    vertical_collide = handle_vertical_collision(player, objects, player.y_vel)
+    vertical_collide = handle_vertical_collision(hero, objects, hero.y_vel)
 
     to_check = [collide_left, collide_right, *vertical_collide]
     for obj in to_check:
         if obj and obj.name == "fire":
-            player.make_hit() 
+            hero.make_hit() 
 
 def main(window):
     clock = pygame.time.Clock()
@@ -103,11 +110,10 @@ def main(window):
     player1 = Player(100, 100, ["MaskDude", "NinjaFrog"], "right", FPS, window)
     player1_steps = 100
 
-    player2 = Player(100, 400, ["VirtualGuy", "MaskDude"], "left", FPS, window)
+    player2 = Player(100, 400, ["VirtualGuy", "PinkMan"], "left", FPS, window)
     player2_steps = 100
 
     active_player = 1
-    # play_heroes = player1.heroes_list
     active_hero = 0
 
     run = True
@@ -119,10 +125,14 @@ def main(window):
         player2.heroes_list[1].loop(FPS)
         fire.loop()
 
-        # handle_move(hero1, objects, steps_player1)
+        handle_move(active_player, active_hero, player1, player2, objects, player1_steps)
         draw(window, background, bg_image, objects, player1, player2)
 
-        play_heroes = player1.heroes_list
+        if active_player == 1:
+            play_heroes = player1.heroes_list
+        else:
+            play_heroes = player2.heroes_list
+
         play_heroes[active_hero].selected = True
 
         for event in pygame.event.get():
@@ -134,46 +144,44 @@ def main(window):
                 # change hero of same player
                 if event.key == pygame.K_TAB:
                     play_heroes[active_hero].selected = False
-                    if active_player == 1:
-                        play_heroes = player1.heroes_list
 
-                        if active_hero < len(play_heroes)-1:
-                            active_hero = active_hero + 1
-                        else:
-                            active_hero = 0
-                            
-                        play_heroes[active_hero].selected = True
-                    
-                    if active_player == 2:
-                        play_heroes = player2.heroes_list
-
-                        if active_hero < len(play_heroes)-1:
-                            active_hero = active_hero + 1
-                        else:
-                            active_hero = 0
-
-                        play_heroes[active_hero].selected = True
-
-                    print(f'active hero: {active_hero}')
-                    print(f'active player: {active_player}')
+                    if active_hero < len(play_heroes)-1:
+                        active_hero = active_hero + 1
+                    else:
+                        active_hero = 0
 
                 # change player and activate first hero
                 if event.key == pygame.K_n:
                     play_heroes[active_hero].selected = False
+
                     active_hero = 0
+                    active_player = active_player + 1
+                    
+                    if active_player >=3:
+                        active_player = 1
+                    else:
+                        active_player = 2
 
                     if active_player == 1:
-                        active_player = 2
-                        play_heroes = player2.heroes_list
+                        play_heroes = player1.heroes_list
 
                     else:
-                        active_player = 1
-                        play_heroes = player1.heroes_list
+                        play_heroes = player2.heroes_list
                     
-                    play_heroes[active_hero].selected = True
+                play_heroes[active_hero].selected = False
+                
+                if active_player == 1:
+                    play_heroes = player1.heroes_list
+                if active_player == 2:
+                    play_heroes = player2.heroes_list
+                
+                play_heroes[active_hero].selected = True
+                
+                print(f'active player: {active_player}')
+                print(f'active hero: {active_hero}')
 
 
-                    print(f'Active Player {active_player}')
+
 
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
