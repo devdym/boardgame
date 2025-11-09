@@ -22,9 +22,16 @@ class Hero(pygame.sprite.Sprite):
         self.hit_count = 0
         self.selected = selected
 
-    def move(self, dx, dy):
+    def move(self, dx, dy, steps):
         self.rect.x += dx
         self.rect.y += dy
+        for n in range(0, steps):
+            if n == steps-1:
+                self.x_vel = 0
+                self.y_vel = 0
+
+
+        
 
     def make_hit(self):
         self.hit = True
@@ -32,6 +39,7 @@ class Hero(pygame.sprite.Sprite):
 
     def move_left(self, vel):
         self.x_vel = -vel
+        
         if self.direction != "left":
             self.direction = "left"
             self.animation_count = 0
@@ -56,7 +64,7 @@ class Hero(pygame.sprite.Sprite):
 
     def loop(self, fps):
         # self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)
-        self.move(self.x_vel, self.y_vel)
+        self.move(self.x_vel, self.y_vel, 10)
 
         if self.hit:
             self.hit_count += 1
