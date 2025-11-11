@@ -4,7 +4,7 @@ import pygame
 from lib.outliner import Outliner
 
 
-WIDTH, HEIGHT = 1000, 800
+WIDTH, HEIGHT = 1280, 720
 
 def flip(sprites):
     return [pygame.transform.flip(sprite, True, False) for sprite in sprites]

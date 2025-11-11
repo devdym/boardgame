@@ -1,18 +1,23 @@
-import pygame
+import pygame, sys
 from lib.fire import Fire
 from lib.load import get_background
 from lib.block import Block
 from lib.player import Player
-
+from button import Button
 
 pygame.init()
 pygame.display.set_caption("BoardGame")
 
-WIDTH, HEIGHT = 1000, 800
+WIDTH, HEIGHT = 1280, 720
 FPS = 90
 PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+BG = pygame.image.load("assets/Background.png")
+
+def get_font(size): # Returns Press-Start-2P in the desired size
+    return pygame.font.Font("assets/font.ttf", size)
 
 def draw(window, background, bg_image, objects, pl1, pl2):
     for tile in background:
@@ -94,12 +99,11 @@ def handle_move(active_player, active_hero, player1, player2, objects, steps_pla
         if obj and obj.name == "fire":
             hero.make_hit() 
 
-def main(window):
+def two_players():
     clock = pygame.time.Clock()
     background, bg_image = get_background("Blue.png")
 
     block_size = 96
-
 
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
@@ -209,6 +213,92 @@ def main(window):
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
             #         player.jump()
 
+def main(window):
+    while True:
+        window.blit(BG, (0, 0))
+
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+        MENU_TEXT = get_font(100).render("MY GAME", True, "#b68f40")
+
+        PL1_TEXT = get_font(30).render("Player 1", True, "#404eb6")
+        PL1_Rect = PL1_TEXT.get_rect()
+        PL1_Rect.center = (200, 20)
+
+        PL1_CH1 = get_font(20).render("Knight", True, "#17e32f")
+        PL1_CH1_Rect = PL1_CH1.get_rect()
+        PL1_CH1_Rect.center = (200, 100)
+        PL1_CH2 = get_font(20).render("Princess", True, "#ffffff")
+        PL1_CH2_Rect = PL1_CH2.get_rect()
+        PL1_CH2_Rect.center = (200, 160)
+        PL1_CH3 = get_font(20).render("Alchemist", True, "#17e32f")
+        PL1_CH3_Rect = PL1_CH3.get_rect()
+        PL1_CH3_Rect.center = (200, 210)
+        PL1_CH4 = get_font(20).render("Puss", True, "#17e32f")
+        PL1_CH4_Rect = PL1_CH4.get_rect()
+        PL1_CH4_Rect.center = (200, 270)
+        PL1_CH5 = get_font(20).render("Bush", True, "#ffffff")
+        PL1_CH5_Rect = PL1_CH5.get_rect()
+        PL1_CH5_Rect.center = (200, 330)
+
+        PL2_TEXT = get_font(30).render("Player 2", True, "#e04b1e")
+        PL2_Rect = PL2_TEXT.get_rect()
+        PL2_Rect.center = (1000, 20)
+
+        PL2_CH1 = get_font(20).render("Knight", True, "#17e32f")
+        PL2_CH1_Rect = PL2_CH1.get_rect()
+        PL2_CH1_Rect.center = (1000, 100)
+        PL2_CH2 = get_font(20).render("Princess", True, "#ffffff")
+        PL2_CH2_Rect = PL2_CH2.get_rect()
+        PL2_CH2_Rect.center = (1000, 160)
+        PL2_CH3 = get_font(20).render("Alchemist", True, "#ffffff")
+        PL2_CH3_Rect = PL2_CH3.get_rect()
+        PL2_CH3_Rect.center = (1000, 210)
+        PL2_CH4 = get_font(20).render("Puss", True, "#17e32f")
+        PL2_CH4_Rect = PL2_CH4.get_rect()
+        PL2_CH4_Rect.center = (1000, 270)
+        PL2_CH5 = get_font(20).render("Bush", True, "#17e32f")
+        PL2_CH5_Rect = PL2_CH5.get_rect()
+        PL2_CH5_Rect.center = (1000, 330)
+
+        MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
+
+
+        START_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(WIDTH//2, HEIGHT//2), 
+                            text_input="START", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(WIDTH//2, (HEIGHT//2)+110), 
+                            text_input="QUIT", font=get_font(35), base_color="#d7fcd4", hovering_color="White")
+
+        window.blit(PL1_TEXT, PL1_Rect)
+        window.blit(PL1_CH1, PL1_CH1_Rect)
+        window.blit(PL1_CH2, PL1_CH2_Rect)
+        window.blit(PL1_CH3, PL1_CH3_Rect)
+        window.blit(PL1_CH4, PL1_CH4_Rect)
+        window.blit(PL1_CH5, PL1_CH5_Rect)
+        window.blit(PL2_TEXT, PL2_Rect)
+        window.blit(PL2_CH1, PL2_CH1_Rect)
+        window.blit(PL2_CH2, PL2_CH2_Rect)
+        window.blit(PL2_CH3, PL2_CH3_Rect)
+        window.blit(PL2_CH4, PL2_CH4_Rect)
+        window.blit(PL2_CH5, PL2_CH5_Rect)
+        
+
+        for button in [START_BUTTON, QUIT_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(window)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if START_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    two_players()
+                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    pygame.quit()
+                    sys.exit()
+        
+        pygame.display.update()
     pygame.quit()
     quit()
 
