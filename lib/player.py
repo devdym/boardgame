@@ -7,12 +7,12 @@ class Player():
         self.heroes_list = []
         self.window = window
         self.location = location
-        step = 100
+        # step = 100
         self.direction = direction
 
         for hero in heroes:
-            h = Hero(location, step, 50, 50, hero, self.direction, False)
-            step = step + 150
+            h = Hero(self.location, self.steps, 50, 50, hero, self.direction, False)
+            self.steps = self.steps + 150
             self.heroes_list.append(h)
             h.loop(FPS)
             h.draw(window, 0)

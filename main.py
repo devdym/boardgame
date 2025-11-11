@@ -105,31 +105,37 @@ def two_players():
 
     block_size = 96
 
-    fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
-    fire.on()
-    # floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
-    objects = [ Block(0, HEIGHT - block_size * 2, block_size),
-               Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
+    fire_pl1 = Fire(100, HEIGHT//2, 16, 32)
+    fire_pl2 = Fire(WIDTH - 100, HEIGHT//2, 16, 32)
+    fire_pl1.on()
+    fire_pl2.on()
 
-    player1 = Player(100, 100, ["MaskDude", "NinjaFrog"], "right", FPS, window)
+    # floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
+    objects = [fire_pl1, fire_pl2]
+    
+    #    objects = [ Block(0, HEIGHT - block_size * 2, block_size),
+    #            Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire_pl1, fire_pl2]
+
+    player1 = Player(200, 200, ["MaskDude", "NinjaFrog", "Pinkman"], "right", FPS, window)
     player1_steps = 100
 
-    player2 = Player(100, 400, ["VirtualGuy", "PinkMan"], "left", FPS, window)
+    player2 = Player(200, WIDTH-200, ["VirtualGuy", "PinkMan", "MaskDude"], "left", FPS, window)
     player2_steps = 100
 
     active_player = 1
     active_hero = 0
     
-    
-
     run = True
     while run:
         clock.tick(FPS)
         player1.heroes_list[0].loop(FPS)
         player1.heroes_list[1].loop(FPS)
+        player1.heroes_list[2].loop(FPS)
         player2.heroes_list[0].loop(FPS)
         player2.heroes_list[1].loop(FPS)
-        fire.loop()
+        player2.heroes_list[2].loop(FPS)
+        fire_pl1.loop()
+        fire_pl2.loop()
 
         # handle_move(active_player, active_hero, player1, player2, objects, player1_steps)
         draw(window, background, bg_image, objects, player1, player2)
@@ -223,43 +229,43 @@ def main(window):
 
         PL1_TEXT = get_font(30).render("Player 1", True, "#404eb6")
         PL1_Rect = PL1_TEXT.get_rect()
-        PL1_Rect.center = (200, 20)
+        PL1_Rect.center = (200, 50)
 
         PL1_CH1 = get_font(20).render("Knight", True, "#17e32f")
         PL1_CH1_Rect = PL1_CH1.get_rect()
-        PL1_CH1_Rect.center = (200, 100)
+        PL1_CH1_Rect.center = (200, 130)
         PL1_CH2 = get_font(20).render("Princess", True, "#ffffff")
         PL1_CH2_Rect = PL1_CH2.get_rect()
-        PL1_CH2_Rect.center = (200, 160)
+        PL1_CH2_Rect.center = (200, 190)
         PL1_CH3 = get_font(20).render("Alchemist", True, "#17e32f")
         PL1_CH3_Rect = PL1_CH3.get_rect()
-        PL1_CH3_Rect.center = (200, 210)
+        PL1_CH3_Rect.center = (200, 240)
         PL1_CH4 = get_font(20).render("Puss", True, "#17e32f")
         PL1_CH4_Rect = PL1_CH4.get_rect()
-        PL1_CH4_Rect.center = (200, 270)
+        PL1_CH4_Rect.center = (200, 300)
         PL1_CH5 = get_font(20).render("Bush", True, "#ffffff")
         PL1_CH5_Rect = PL1_CH5.get_rect()
-        PL1_CH5_Rect.center = (200, 330)
+        PL1_CH5_Rect.center = (200, 360)
 
         PL2_TEXT = get_font(30).render("Player 2", True, "#e04b1e")
         PL2_Rect = PL2_TEXT.get_rect()
-        PL2_Rect.center = (1000, 20)
+        PL2_Rect.center = (1000, 50)
 
         PL2_CH1 = get_font(20).render("Knight", True, "#17e32f")
         PL2_CH1_Rect = PL2_CH1.get_rect()
-        PL2_CH1_Rect.center = (1000, 100)
+        PL2_CH1_Rect.center = (1000, 130)
         PL2_CH2 = get_font(20).render("Princess", True, "#ffffff")
         PL2_CH2_Rect = PL2_CH2.get_rect()
-        PL2_CH2_Rect.center = (1000, 160)
+        PL2_CH2_Rect.center = (1000, 190)
         PL2_CH3 = get_font(20).render("Alchemist", True, "#ffffff")
         PL2_CH3_Rect = PL2_CH3.get_rect()
-        PL2_CH3_Rect.center = (1000, 210)
+        PL2_CH3_Rect.center = (1000, 240)
         PL2_CH4 = get_font(20).render("Puss", True, "#17e32f")
         PL2_CH4_Rect = PL2_CH4.get_rect()
-        PL2_CH4_Rect.center = (1000, 270)
+        PL2_CH4_Rect.center = (1000, 300)
         PL2_CH5 = get_font(20).render("Bush", True, "#17e32f")
         PL2_CH5_Rect = PL2_CH5.get_rect()
-        PL2_CH5_Rect.center = (1000, 330)
+        PL2_CH5_Rect.center = (1000, 360)
 
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
 
