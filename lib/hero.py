@@ -1,4 +1,5 @@
 import pygame
+
 from lib.load import load_sprite_sheets
 
 
@@ -26,20 +27,17 @@ class Hero(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
         for n in range(0, steps):
-            if n == steps-1:
+            if n == steps - 1:
                 self.x_vel = 0
                 self.y_vel = 0
 
-
-        
-
     def make_hit(self):
         self.hit = True
-        self.hit_count = 0 
+        self.hit_count = 0
 
     def move_left(self, vel):
         self.x_vel = -vel
-        
+
         if self.direction != "left":
             self.direction = "left"
             self.animation_count = 0
@@ -82,7 +80,7 @@ class Hero(pygame.sprite.Sprite):
     def update_sprite(self):
         sprite_sheet = "idle"
         if self.hit:
-            sprite_sheet = "hit" 
+            sprite_sheet = "hit"
 
         elif self.selected:
             sprite_sheet = "outlined"
@@ -90,7 +88,7 @@ class Hero(pygame.sprite.Sprite):
             sprite_sheet = "fall"
         elif self.x_vel != 0:
             sprite_sheet = "run"
-        
+
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
         sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)

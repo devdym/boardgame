@@ -6,7 +6,7 @@ from button import Button
 
 # from lib.block import Block
 from lib.fire import Fire
-from lib.load import get_background
+from lib.load import get_background, get_font
 from lib.player import Player
 
 pygame.init()
@@ -17,15 +17,10 @@ FPS = 90
 PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
-
 BG = pygame.image.load("assets/Background.png")
 
 
-def get_font(size):  # Returns Press-Start-2P in the desired size
-    return pygame.font.Font("assets/font.ttf", size)
-
-
-def draw(window, background, bg_image, objects, pl1, pl2):
+def draw(window, background, bg_image, objects, pl1, pl2, pl1_dash, pl2_dash):
     for tile in background:
         window.blit(bg_image, tile)
 
@@ -37,6 +32,12 @@ def draw(window, background, bg_image, objects, pl1, pl2):
 
     pl1.draw(window, 0)
     pl2.draw(window, 0)
+
+    for pl in pl1_dash:
+        window.blit(pl[0], pl[1])
+
+    for pl in pl2_dash:
+        window.blit(pl[0], pl[1])
 
     pygame.display.update()
 
@@ -130,7 +131,7 @@ def two_players():
     player2 = Player(
         200, WIDTH - 200, ["Knight", "Puss", "Princes"], "left", FPS, window
     )
-    player2_steps = 100
+    # player2_steps = 100
 
     active_player = 1
     active_hero = 0
@@ -147,8 +148,48 @@ def two_players():
         flag_pl1.loop()
         flag_pl2.loop()
 
+        PL1_HP = get_font(20).render("HP", True, "#404eb6")
+        PL1_HP_Rect = PL1_HP.get_rect()
+        PL1_HP_Rect.center = (100, 30)
+
+        PL1_SHIELD = get_font(20).render("SHIELD", True, "#404eb6")
+        PL1_SHIELD_Rect = PL1_SHIELD.get_rect()
+        PL1_SHIELD_Rect.center = (100, 60)
+
+        PL1_ATK = get_font(20).render("ATTACK", True, "#404eb6")
+        PL1_ATK_rect = PL1_ATK.get_rect()
+        PL1_ATK_rect.center = (100, 90)
+
+        pl1_dash = [
+            [PL1_HP, PL1_HP_Rect],
+            [PL1_SHIELD, PL1_SHIELD_Rect],
+            [PL1_ATK, PL1_ATK_rect],
+        ]
+
+        PL2_HP = get_font(20).render("HP", True, "#e04b1e")
+        PL2_HP_Rect = PL2_HP.get_rect()
+        PL2_HP_Rect.center = (1000, 30)
+
+        PL2_SHIELD = get_font(20).render("SHIELD", True, "#e04b1e")
+        PL2_SHIELD_Rect = PL2_SHIELD.get_rect()
+        PL2_SHIELD_Rect.center = (1000, 60)
+
+        PL2_ATK = get_font(20).render("ATTACK", True, "#e04b1e")
+        PL2_ATK_rect = PL2_ATK.get_rect()
+        PL2_ATK_rect.center = (1000, 90)
+
+        pl2_dash = [
+            [PL2_HP, PL2_HP_Rect],
+            [PL2_SHIELD, PL2_SHIELD_Rect],
+            [PL2_ATK, PL2_ATK_rect],
+        ]
+
         # handle_move(active_player, active_hero, player1, player2, objects, player1_steps)
-        draw(window, background, bg_image, objects, player1, player2)
+
+        #
+        draw(
+            window, background, bg_image, objects, player1, player2, pl1_dash, pl2_dash
+        )
 
         if active_player == 1:
             play_heroes = player1.heroes_list
@@ -322,8 +363,6 @@ def main(window):
                     sys.exit()
 
         pygame.display.update()
-    pygame.quit()
-    quit()
 
 
 if __name__ == "__main__":
