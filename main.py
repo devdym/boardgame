@@ -1,9 +1,13 @@
-import pygame, sys
+import sys
+
+import pygame
+
+from button import Button
+
+# from lib.block import Block
 from lib.fire import Fire
 from lib.load import get_background
-from lib.block import Block
 from lib.player import Player
-from button import Button
 
 pygame.init()
 pygame.display.set_caption("BoardGame")
@@ -16,8 +20,10 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 BG = pygame.image.load("assets/Background.png")
 
-def get_font(size): # Returns Press-Start-2P in the desired size
+
+def get_font(size):  # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/font.ttf", size)
+
 
 def draw(window, background, bg_image, objects, pl1, pl2):
     for tile in background:
@@ -34,6 +40,7 @@ def draw(window, background, bg_image, objects, pl1, pl2):
 
     pygame.display.update()
 
+
 def handle_vertical_collision(player, objects, dy):
     collided_objects = []
     for obj in objects:
@@ -47,6 +54,7 @@ def handle_vertical_collision(player, objects, dy):
 
     return collided_objects
 
+
 def collide(player, objects, dx, dy):
     player.move(dx, dy, 500)
     player.update()
@@ -58,7 +66,8 @@ def collide(player, objects, dx, dy):
 
     player.move(-dx, dy, 500)
     player.update()
-    return collided_object 
+    return collided_object
+
 
 def handle_move(active_player, active_hero, player1, player2, objects, steps_player1):
     if active_player == 1:
@@ -67,7 +76,7 @@ def handle_move(active_player, active_hero, player1, player2, objects, steps_pla
         play_heroes = player2.heroes_list
 
     hero = play_heroes[active_hero]
-    
+
     keys = pygame.key.get_pressed()
 
     hero.x_vel = 0
@@ -89,42 +98,43 @@ def handle_move(active_player, active_hero, player1, player2, objects, steps_pla
     if keys[pygame.K_DOWN] and not collide_down:
         hero.move_down(PLAYER_VEL)
         steps_player1 = steps_player1 + 1
-    
-    print(f'steps_pl1 {steps_player1}')
+
+    print(f"steps_pl1 {steps_player1}")
 
     vertical_collide = handle_vertical_collision(hero, objects, hero.y_vel)
 
     to_check = [collide_left, collide_right, *vertical_collide]
     for obj in to_check:
         if obj and obj.name == "fire":
-            hero.make_hit() 
+            hero.make_hit()
+
 
 def two_players():
     clock = pygame.time.Clock()
     background, bg_image = get_background("Blue.png")
 
-    block_size = 96
-
-    fire_pl1 = Fire(100, HEIGHT//2, 16, 32)
-    fire_pl2 = Fire(WIDTH - 100, HEIGHT//2, 16, 32)
-    fire_pl1.on()
-    fire_pl2.on()
+    flag_pl1 = Fire(100, HEIGHT // 2, 16, 32)
+    flag_pl2 = Fire(WIDTH - 100, HEIGHT // 2, 16, 32)
+    flag_pl1.on()
+    flag_pl2.on()
 
     # floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
-    objects = [fire_pl1, fire_pl2]
-    
+    objects = [flag_pl1, flag_pl2]
+
     #    objects = [ Block(0, HEIGHT - block_size * 2, block_size),
     #            Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire_pl1, fire_pl2]
 
-    player1 = Player(200, 200, ["MaskDude", "NinjaFrog", "Pinkman"], "right", FPS, window)
+    player1 = Player(200, 200, ["Knight", "Bushie", "Alchemist"], "right", FPS, window)
     player1_steps = 100
 
-    player2 = Player(200, WIDTH-200, ["VirtualGuy", "PinkMan", "MaskDude"], "left", FPS, window)
+    player2 = Player(
+        200, WIDTH - 200, ["Knight", "Puss", "Princes"], "left", FPS, window
+    )
     player2_steps = 100
 
     active_player = 1
     active_hero = 0
-    
+
     run = True
     while run:
         clock.tick(FPS)
@@ -134,8 +144,8 @@ def two_players():
         player2.heroes_list[0].loop(FPS)
         player2.heroes_list[1].loop(FPS)
         player2.heroes_list[2].loop(FPS)
-        fire_pl1.loop()
-        fire_pl2.loop()
+        flag_pl1.loop()
+        flag_pl2.loop()
 
         # handle_move(active_player, active_hero, player1, player2, objects, player1_steps)
         draw(window, background, bg_image, objects, player1, player2)
@@ -165,7 +175,7 @@ def two_players():
                 if event.key == pygame.K_TAB:
                     play_heroes[active_hero].selected = False
 
-                    if active_hero < len(play_heroes)-1:
+                    if active_hero < len(play_heroes) - 1:
                         active_hero = active_hero + 1
                     else:
                         active_hero = 0
@@ -176,8 +186,8 @@ def two_players():
 
                     active_hero = 0
                     active_player = active_player + 1
-                    
-                    if active_player >=3:
+
+                    if active_player >= 3:
                         active_player = 1
                     else:
                         active_player = 2
@@ -187,18 +197,18 @@ def two_players():
 
                     else:
                         play_heroes = player2.heroes_list
-                    
+
                 play_heroes[active_hero].selected = False
-                
+
                 if active_player == 1:
                     play_heroes = player1.heroes_list
                 if active_player == 2:
                     play_heroes = player2.heroes_list
-                
+
                 play_heroes[active_hero].selected = True
-                
-                print(f'active player: {active_player}')
-                print(f'active hero: {active_hero}')
+
+                print(f"active player: {active_player}")
+                print(f"active hero: {active_hero}")
 
                 if event.key == pygame.K_LEFT and not collide_left:
                     hero.move_left(PLAYER_VEL)
@@ -213,19 +223,18 @@ def two_players():
                     hero.move_down(PLAYER_VEL)
                     player1_steps = player1_steps + 1
 
-                print(f'player1_steps: {player1_steps}')
+                print(f"player1_steps: {player1_steps}")
 
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and player.jump_count < 2:
             #         player.jump()
+
 
 def main(window):
     while True:
         window.blit(BG, (0, 0))
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
-
-        MENU_TEXT = get_font(100).render("MY GAME", True, "#b68f40")
 
         PL1_TEXT = get_font(30).render("Player 1", True, "#404eb6")
         PL1_Rect = PL1_TEXT.get_rect()
@@ -267,13 +276,22 @@ def main(window):
         PL2_CH5_Rect = PL2_CH5.get_rect()
         PL2_CH5_Rect.center = (1000, 360)
 
-        MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
-
-
-        START_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(WIDTH//2, HEIGHT//2), 
-                            text_input="START", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
-        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(WIDTH//2, (HEIGHT//2)+110), 
-                            text_input="QUIT", font=get_font(35), base_color="#d7fcd4", hovering_color="White")
+        START_BUTTON = Button(
+            image=pygame.image.load("assets/Play Rect.png"),
+            pos=(WIDTH // 2, HEIGHT // 2),
+            text_input="START",
+            font=get_font(75),
+            base_color="#d7fcd4",
+            hovering_color="White",
+        )
+        QUIT_BUTTON = Button(
+            image=pygame.image.load("assets/Quit Rect.png"),
+            pos=(WIDTH // 2, (HEIGHT // 2) + 110),
+            text_input="QUIT",
+            font=get_font(35),
+            base_color="#d7fcd4",
+            hovering_color="White",
+        )
 
         window.blit(PL1_TEXT, PL1_Rect)
         window.blit(PL1_CH1, PL1_CH1_Rect)
@@ -287,12 +305,11 @@ def main(window):
         window.blit(PL2_CH3, PL2_CH3_Rect)
         window.blit(PL2_CH4, PL2_CH4_Rect)
         window.blit(PL2_CH5, PL2_CH5_Rect)
-        
 
         for button in [START_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(window)
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -303,10 +320,11 @@ def main(window):
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-        
+
         pygame.display.update()
     pygame.quit()
     quit()
+
 
 if __name__ == "__main__":
     main(window)
