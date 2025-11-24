@@ -7,9 +7,9 @@ from lib.object import Object
 class Flag(Object):
     ANIMATION_DELAY = 3
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, color):
         super().__init__(x, y, width, height, "flag")
-        self.flag = load_sprite_sheets("Traps", "Flag", width, height, False)
+        self.flag = load_sprite_sheets("Traps", color, width, height, False)
         self.image = self.flag["off"][0]
         self.mask = pygame.mask.from_surface(self.image)
         self.animation_count = 0

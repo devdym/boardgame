@@ -3,9 +3,10 @@ import sys
 import pygame
 
 from button import Button
+from lib.dash import HealthBar
 
 # from lib.block import Block
-from lib.fire import Fire
+from lib.flag import Flag
 from lib.load import get_background, get_font
 from lib.player import Player
 
@@ -114,9 +115,9 @@ def two_players():
     clock = pygame.time.Clock()
     background, bg_image = get_background("Blue.png")
 
-    flag_pl1 = Fire(100, HEIGHT // 2, 16, 32)
-    flag_pl2 = Fire(WIDTH - 100, HEIGHT // 2, 16, 32)
+    flag_pl1 = Flag(100, HEIGHT // 2, 16, 32, "Red")
     flag_pl1.on()
+    flag_pl2 = Flag(WIDTH - 100, HEIGHT // 2, 16, 32, "Red")
     flag_pl2.on()
 
     # floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
@@ -132,6 +133,10 @@ def two_players():
         200, WIDTH - 200, ["Knight", "Puss", "Princes"], "left", FPS, window
     )
     # player2_steps = 100
+
+    health_bar_blue = HealthBar(250, 200, 300, 40, 100)
+    shield_bar_blue = HealthBar(250, 200, 300, 40, 100)
+    attack_bar_blue = HealthBar(250, 200, 300, 40, 100)
 
     active_player = 1
     active_hero = 0
@@ -151,6 +156,7 @@ def two_players():
         PL1_HP = get_font(20).render("HP", True, "#404eb6")
         PL1_HP_Rect = PL1_HP.get_rect()
         PL1_HP_Rect.center = (100, 30)
+        health_bar_blue.draw(window)
 
         PL1_SHIELD = get_font(20).render("SHIELD", True, "#404eb6")
         PL1_SHIELD_Rect = PL1_SHIELD.get_rect()
