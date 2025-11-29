@@ -1,7 +1,7 @@
 import pygame
 
-from lib.load import load_sprite_sheets
 from lib.object import Object
+from lib.utils import load_sprite_sheets
 
 
 class Flag(Object):
@@ -9,8 +9,10 @@ class Flag(Object):
 
     def __init__(self, x, y, width, height, color):
         super().__init__(x, y, width, height, "flag")
-        self.flag = load_sprite_sheets("Traps", color, width, height, False)
+        self.flag = load_sprite_sheets("Traps", "Red", width, height, False)
         self.image = self.flag["off"][0]
+        if color == "Blue":
+            self.image = pygame.transform.hsl(self.image, 0.5, 0.8, 0.6)
         self.mask = pygame.mask.from_surface(self.image)
         self.animation_count = 0
         self.animation_name = "off"

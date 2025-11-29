@@ -4,71 +4,19 @@ import pygame
 
 from button import Button
 from lib.dash import HealthBar
-
-# from lib.block import Block
 from lib.flag import Flag
-from lib.load import get_background, get_font
 from lib.player import Player
+from lib.utils import collide, draw, get_background, get_font, handle_collision
 
 pygame.init()
 pygame.display.set_caption("BoardGame")
 
 WIDTH, HEIGHT = 1280, 720
-FPS = 90
+FPS = 60
 PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 BG = pygame.image.load("assets/Background.png")
-
-
-def draw(window, background, bg_image, objects, pl1, pl2, pl1_dash, pl2_dash):
-    for tile in background:
-        window.blit(bg_image, tile)
-
-    for obj in objects:
-        obj.draw(window)
-
-    # for player in players.heroes:
-    #     player.draw(window, offset_x)
-
-    pl1.draw(window, 0)
-    pl2.draw(window, 0)
-
-    for pl in pl1_dash:
-        window.blit(pl[0], pl[1])
-
-    for pl in pl2_dash:
-        window.blit(pl[0], pl[1])
-
-    pygame.display.update()
-
-
-def handle_vertical_collision(player, objects, dy):
-    collided_objects = []
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            if dy > 0:
-                player.rect.bottom = obj.rect.top
-            elif dy < 0:
-                player.rect.top = obj.rect.bottom
-
-            collided_objects.append(obj)
-
-    return collided_objects
-
-
-def collide(player, objects, dx, dy):
-    player.move(dx, dy, 500)
-    player.update()
-    collided_object = None
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            collided_object = obj
-            break
-
-    player.move(-dx, dy, 500)
-    player.update()
-    return collided_object
 
 
 def handle_move(active_player, active_hero, player1, player2, objects, steps_player1):
@@ -83,10 +31,10 @@ def handle_move(active_player, active_hero, player1, player2, objects, steps_pla
 
     hero.x_vel = 0
     hero.y_vel = 0
-    collide_left = collide(hero, objects, -PLAYER_VEL * 2, PLAYER_VEL * 2)
-    collide_right = collide(hero, objects, PLAYER_VEL * 2, PLAYER_VEL * 2)
-    collide_up = collide(hero, objects, PLAYER_VEL * 2, -PLAYER_VEL * 2)
-    collide_down = collide(hero, objects, -PLAYER_VEL * 2, -PLAYER_VEL * 2)
+    collide_left = collide(hero, player1, player2, -PLAYER_VEL * 2, PLAYER_VEL * 2)
+    collide_right = collide(hero, player1, player2, PLAYER_VEL * 2, PLAYER_VEL * 2)
+    collide_up = collide(hero, player1, player2, PLAYER_VEL * 2, -PLAYER_VEL * 2)
+    collide_down = collide(hero, player1, player2, -PLAYER_VEL * 2, -PLAYER_VEL * 2)
 
     if keys[pygame.K_LEFT] and not collide_left:
         hero.move_left(PLAYER_VEL)
@@ -103,28 +51,33 @@ def handle_move(active_player, active_hero, player1, player2, objects, steps_pla
 
     print(f"steps_pl1 {steps_player1}")
 
-    vertical_collide = handle_vertical_collision(hero, objects, hero.y_vel)
+    # vertical_collide = handle_collision(hero, objects, hero.x_vel, hero.y_vel)
+    # to_check = [
+    #     collide_left,
+    #     collide_right,
+    #     collide_up,
+    #     collide_down,
+    #     *vertical_collide,
+    # ]
 
-    to_check = [collide_left, collide_right, *vertical_collide]
-    for obj in to_check:
-        if obj and obj.name == "fire":
-            hero.make_hit()
+    # for obj in to_check:
+    #     if obj and obj.name == "hero":
+    #         hero.make_hit()
 
 
 def two_players():
+    active_player = 1
+    active_hero = 0
+
     clock = pygame.time.Clock()
     background, bg_image = get_background("Blue.png")
 
     flag_pl1 = Flag(100, HEIGHT // 2, 16, 32, "Red")
     flag_pl1.on()
-    flag_pl2 = Flag(WIDTH - 100, HEIGHT // 2, 16, 32, "Red")
+    flag_pl2 = Flag(WIDTH - 100, HEIGHT // 2, 16, 32, "Blue")
     flag_pl2.on()
 
-    # floor = [Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
     objects = [flag_pl1, flag_pl2]
-
-    #    objects = [ Block(0, HEIGHT - block_size * 2, block_size),
-    #            Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire_pl1, fire_pl2]
 
     player1 = Player(200, 200, ["Knight", "Bushie", "Alchemist"], "right", FPS, window)
     player1_steps = 100
@@ -137,9 +90,6 @@ def two_players():
     health_bar_blue = HealthBar(250, 200, 300, 40, 100)
     shield_bar_blue = HealthBar(250, 200, 300, 40, 100)
     attack_bar_blue = HealthBar(250, 200, 300, 40, 100)
-
-    active_player = 1
-    active_hero = 0
 
     run = True
     while run:
@@ -156,7 +106,7 @@ def two_players():
         PL1_HP = get_font(20).render("HP", True, "#404eb6")
         PL1_HP_Rect = PL1_HP.get_rect()
         PL1_HP_Rect.center = (100, 30)
-        health_bar_blue.draw(window)
+        # health_bar_blue.draw(window)
 
         PL1_SHIELD = get_font(20).render("SHIELD", True, "#404eb6")
         PL1_SHIELD_Rect = PL1_SHIELD.get_rect()
@@ -190,11 +140,20 @@ def two_players():
             [PL2_ATK, PL2_ATK_rect],
         ]
 
-        # handle_move(active_player, active_hero, player1, player2, objects, player1_steps)
+        handle_move(
+            active_player, active_hero, player1, player2, objects, player1_steps
+        )
 
         #
         draw(
-            window, background, bg_image, objects, player1, player2, pl1_dash, pl2_dash
+            window,
+            background,
+            bg_image,
+            objects,
+            player1,
+            player2,
+            pl1_dash,
+            pl2_dash,
         )
 
         if active_player == 1:
@@ -213,10 +172,18 @@ def two_players():
                 hero = play_heroes[active_hero]
                 hero.x_vel = 0
                 hero.y_vel = 0
-                collide_left = collide(hero, objects, -PLAYER_VEL * 2, PLAYER_VEL * 2)
-                collide_right = collide(hero, objects, PLAYER_VEL * 2, PLAYER_VEL * 2)
-                collide_up = collide(hero, objects, PLAYER_VEL * 2, -PLAYER_VEL * 2)
-                collide_down = collide(hero, objects, -PLAYER_VEL * 2, -PLAYER_VEL * 2)
+                collide_left = collide(
+                    hero, player1, player2, -PLAYER_VEL * 2, PLAYER_VEL * 2
+                )
+                collide_right = collide(
+                    hero, player1, player2, PLAYER_VEL * 2, PLAYER_VEL * 2
+                )
+                collide_up = collide(
+                    hero, player1, player2, PLAYER_VEL * 2, -PLAYER_VEL * 2
+                )
+                collide_down = collide(
+                    hero, player1, player2, -PLAYER_VEL * 2, -PLAYER_VEL * 2
+                )
 
                 # change hero of same player
                 if event.key == pygame.K_TAB:

@@ -1,6 +1,7 @@
-from lib.object import Object
 import pygame
-from lib.load import load_sprite_sheets
+
+from lib.object import Object
+from lib.utils import load_sprite_sheets
 
 
 class Fire(Object):

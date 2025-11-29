@@ -19,10 +19,9 @@ def load_sprite_sheets(dir1, dir2, width, height, direction=False):
     all_sprites = {}
 
     outliner = Outliner()
-    ol = False
 
     for image in images:
-        sprite_sheet = pygame.image.load(join(path, image)).convert()
+        sprite_sheet = pygame.image.load(join(path, image)).convert_alpha()
 
         sprites = []
         for i in range(sprite_sheet.get_width() // width):
@@ -76,3 +75,59 @@ def get_background(name):
 
 def get_font(size):
     return pygame.font.Font("assets/font.ttf", size)
+
+
+def draw(window, background, bg_image, objects, pl1, pl2, pl1_dash, pl2_dash):
+    for tile in background:
+        window.blit(bg_image, tile)
+
+    for obj in objects:
+        obj.draw(window)
+
+    pl1.draw(window, 0)
+    pl2.draw(window, 0)
+
+    for pl in pl1_dash:
+        window.blit(pl[0], pl[1])
+
+    for pl in pl2_dash:
+        window.blit(pl[0], pl[1])
+
+    pygame.display.update()
+
+
+def handle_collision(player, objects, dx, dy):
+    collided_objects = []
+    for obj in objects:
+        if pygame.sprite.collide_mask(player, obj):
+            if dy > 0:
+                player.rect.bottom = obj.rect.top
+            elif dy < 0:
+                player.rect.top = obj.rect.bottom
+            elif dx > 0:
+                player.rect.right = obj.rect.left
+            elif dx < 0:
+                player.rect.left = obj.rect.right
+
+            collided_objects.append(obj)
+
+    return collided_objects
+
+
+def collide(hero, player1, player2, dx, dy):
+    hero.move(dx, dy, 500)
+    hero.update()
+    collided_object = None
+    for obj in player1.heroes_list:
+        if pygame.sprite.collide_mask(hero, obj):
+            collided_object = obj
+            break
+
+    for obj in player2.heroes_list:
+        if pygame.sprite.collide_mask(hero, obj):
+            collided_object = obj
+            break
+
+    hero.move(-dx, dy, 500)
+    hero.update()
+    return collided_object
