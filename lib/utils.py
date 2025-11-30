@@ -6,6 +6,7 @@ import pygame
 from lib.outliner import Outliner
 
 WIDTH, HEIGHT = 1280, 720
+PLAYER_VEL = 5
 
 
 def flip(sprites):
@@ -96,18 +97,16 @@ def draw(window, background, bg_image, objects, pl1, pl2, pl1_dash, pl2_dash):
     pygame.display.update()
 
 
-def handle_collision(player, objects, dx, dy):
+def handle_vertical_collision(hero, objects, dy):
     collided_objects = []
     for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
+        if pygame.sprite.collide_mask(hero, obj):
             if dy > 0:
-                player.rect.bottom = obj.rect.top
+                hero.rect.bottom = obj.rect.top
+                hero.landed()
             elif dy < 0:
-                player.rect.top = obj.rect.bottom
-            elif dx > 0:
-                player.rect.right = obj.rect.left
-            elif dx < 0:
-                player.rect.left = obj.rect.right
+                hero.rect.top = obj.rect.bottom
+                hero.hit_head()
 
             collided_objects.append(obj)
 
@@ -131,3 +130,45 @@ def collide(hero, player1, player2, dx, dy):
     hero.move(-dx, dy, 500)
     hero.update()
     return collided_object
+
+
+def handle_move(active_player, active_hero, player1, player2, objects, steps_player1):
+    if active_player == 1:
+        play_heroes = player1.heroes_list
+    else:
+        play_heroes = player2.heroes_list
+
+    hero = play_heroes[active_hero]
+
+    keys = pygame.key.get_pressed()
+
+    hero.x_vel = 0
+    hero.y_vel = 0
+    collide_left = collide(hero, player1, player2, -PLAYER_VEL * 2, 0)
+    collide_right = collide(hero, player1, player2, PLAYER_VEL * 2, 0)
+
+    if keys[pygame.K_LEFT] and not collide_left:
+        hero.move_left(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
+    if keys[pygame.K_RIGHT] and not collide_right:
+        hero.move_right(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
+    if keys[pygame.K_UP]:
+        hero.move_up(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
+    if keys[pygame.K_DOWN]:
+        hero.move_down(PLAYER_VEL)
+        steps_player1 = steps_player1 + 1
+
+    print(f"steps_pl1 {steps_player1}")
+
+    vertical_collide = handle_vertical_collision(hero, objects, hero.y_vel)
+    to_check = [
+        collide_left,
+        collide_right,
+        *vertical_collide,
+    ]
+
+    for obj in to_check:
+        if obj and obj.name == "block":
+            hero.make_hit()

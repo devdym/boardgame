@@ -17,7 +17,7 @@ class Hero(pygame.sprite.Sprite):
         self.SPRITES = load_sprite_sheets("MainCharacters", name, 32, 32, True)
         self.direction = direction
         self.animation_count = 0
-        self.fall_count = 0
+        # self.fall_count = 0
         self.hit = False
         self.hit_count = 0
         self.selected = selected
@@ -69,11 +69,13 @@ class Hero(pygame.sprite.Sprite):
             self.hit = False
             self.hit_count = 0
 
-        self.fall_count += 1
+        # self.fall_count += 1
         self.update_sprite()
 
+    def landed(self):
+        self.y_vel = 0
+
     def hit_head(self):
-        self.count = 0
         self.y_vel *= -1
 
     def update_sprite(self):
