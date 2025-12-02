@@ -6,7 +6,13 @@ from button import Button
 from lib.dash import HealthBar
 from lib.flag import Flag
 from lib.player import Player
-from lib.utils import collide, draw, get_background, get_font, handle_move
+from lib.utils import (
+    collide,
+    draw,
+    get_background,
+    get_font,
+    handle_vertical_collision,
+)
 
 pygame.init()
 pygame.display.set_caption("BoardGame")
@@ -33,11 +39,13 @@ def two_players():
 
     objects = [flag_pl1, flag_pl2]
 
-    player1 = Player(200, 200, ["Knight", "Bushie", "Alchemist"], "right", FPS, window)
+    player1 = Player(
+        200, 200, ["Knight", "Bushie", "Alchemist"], "right", "player1", FPS, window
+    )
     player1_steps = 100
 
     player2 = Player(
-        200, WIDTH - 200, ["Knight", "Puss", "Princes"], "left", FPS, window
+        200, WIDTH - 200, ["Knight", "Puss", "Princes"], "left", "player2", FPS, window
     )
     # player2_steps = 100
 
@@ -57,16 +65,16 @@ def two_players():
         flag_pl1.loop()
         flag_pl2.loop()
 
-        PL1_HP = get_font(20).render("HP", True, "#404eb6")
+        PL1_HP = get_font(20).render("HP 32", True, "#404eb6")
         PL1_HP_Rect = PL1_HP.get_rect()
         PL1_HP_Rect.center = (100, 30)
         # health_bar_blue.draw(window)
 
-        PL1_SHIELD = get_font(20).render("SHIELD", True, "#404eb6")
+        PL1_SHIELD = get_font(20).render("SHIELD 100", True, "#404eb6")
         PL1_SHIELD_Rect = PL1_SHIELD.get_rect()
         PL1_SHIELD_Rect.center = (100, 60)
 
-        PL1_ATK = get_font(20).render("ATTACK", True, "#404eb6")
+        PL1_ATK = get_font(20).render("ATTACK 17", True, "#404eb6")
         PL1_ATK_rect = PL1_ATK.get_rect()
         PL1_ATK_rect.center = (100, 90)
 
@@ -76,27 +84,34 @@ def two_players():
             [PL1_ATK, PL1_ATK_rect],
         ]
 
-        PL2_HP = get_font(20).render("HP", True, "#e04b1e")
+        PL2_HP = get_font(20).render("HP 34", True, "#e04b1e")
         PL2_HP_Rect = PL2_HP.get_rect()
         PL2_HP_Rect.center = (1000, 30)
 
-        PL2_SHIELD = get_font(20).render("SHIELD", True, "#e04b1e")
+        PL2_SHIELD = get_font(20).render("SHIELD 100", True, "#e04b1e")
         PL2_SHIELD_Rect = PL2_SHIELD.get_rect()
         PL2_SHIELD_Rect.center = (1000, 60)
 
-        PL2_ATK = get_font(20).render("ATTACK", True, "#e04b1e")
+        PL2_ATK = get_font(20).render("ATTACK 17", True, "#e04b1e")
         PL2_ATK_rect = PL2_ATK.get_rect()
         PL2_ATK_rect.center = (1000, 90)
+
+        INFO = get_font(20).render(
+            "press TAB to change player, press N to change hero", True, "#e04b1e"
+        )
+        INFO_rect = PL2_ATK.get_rect()
+        INFO_rect.center = (100, 700)
 
         pl2_dash = [
             [PL2_HP, PL2_HP_Rect],
             [PL2_SHIELD, PL2_SHIELD_Rect],
             [PL2_ATK, PL2_ATK_rect],
+            [INFO, INFO_rect],
         ]
 
-        handle_move(
-            active_player, active_hero, player1, player2, objects, player1_steps
-        )
+        # handle_move(
+        #     active_player, active_hero, player1, player2, objects, player1_steps
+        # )
 
         #
         draw(
@@ -117,76 +132,96 @@ def two_players():
 
         play_heroes[active_hero].selected = True
 
+        keys = pygame.key.get_pressed()
+        # if keys[pygame.KEYDOWN]:
+        hero = play_heroes[active_hero]
+
+        hero.x_vel = 0
+        hero.y_vel = 0
+        if active_player == 1:
+            collide_left = collide(hero, player1, player2, 1, -PLAYER_VEL * 2, 0)
+            collide_right = collide(hero, player1, player2, 1, PLAYER_VEL * 2, 0)
+        else:
+            collide_left = collide(hero, player1, player2, 2, -PLAYER_VEL * 2, 0)
+            collide_right = collide(hero, player1, player2, 2, PLAYER_VEL * 2, 0)
+
+        # change hero of same player
+        if keys[pygame.K_TAB]:
+            play_heroes[active_hero].selected = False
+
+            if active_hero < len(play_heroes) - 1:
+                active_hero = active_hero + 1
+            else:
+                active_hero = 0
+
+        # change player and activate first hero
+        if keys[pygame.K_n]:
+            play_heroes[active_hero].selected = False
+
+            active_hero = 0
+            active_player = active_player + 1
+
+            if active_player >= 3:
+                active_player = 1
+            else:
+                active_player = 2
+
+            if active_player == 1:
+                play_heroes = player1.heroes_list
+
+            else:
+                play_heroes = player2.heroes_list
+
+        play_heroes[active_hero].selected = False
+
+        if active_player == 1:
+            play_heroes = player1.heroes_list
+        if active_player == 2:
+            play_heroes = player2.heroes_list
+
+        play_heroes[active_hero].selected = True
+
+        print(f"active player: {active_player}")
+        print(f"active hero: {active_hero}")
+
+        if keys[pygame.K_LEFT] and not collide_left:
+            hero.move_left(PLAYER_VEL)
+            player1_steps = player1_steps + 1
+        if keys[pygame.K_RIGHT] and not collide_right:
+            hero.move_right(PLAYER_VEL)
+            player1_steps = player1_steps + 1
+        if keys[pygame.K_UP]:
+            hero.move_up(PLAYER_VEL)
+            player1_steps = player1_steps + 1
+        if keys[pygame.K_DOWN]:
+            hero.move_down(PLAYER_VEL)
+            player1_steps = player1_steps + 1
+
+        print(f"player1_steps: {player1_steps}")
+
+        vertical_collide = handle_vertical_collision(
+            hero, objects, hero.x_vel, hero.y_vel
+        )
+        to_check = [
+            collide_left,
+            collide_right,
+            *vertical_collide,
+        ]
+
+        for obj in to_check:
+            if obj and obj.name == "player1":
+                hero.make_hit()
+
+                # hero.move(10, 10, 10)
+
+        # if event.type == pygame.KEYDOWN:
+        #     if event.key == pygame.K_SPACE and player.jump_count < 2:
+        #         player.jump()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
-
-            # if event.type == pygame.KEYDOWN:
-            #     hero = play_heroes[active_hero]
-
-            #     hero.x_vel = 0
-            #     hero.y_vel = 0
-            #     collide_left = collide(hero, player1, player2, -PLAYER_VEL * 2, 0)
-            #     collide_right = collide(hero, player1, player2, PLAYER_VEL * 2, 0)
-
-            #     # change hero of same player
-            #     if event.key == pygame.K_TAB:
-            #         play_heroes[active_hero].selected = False
-
-            #         if active_hero < len(play_heroes) - 1:
-            #             active_hero = active_hero + 1
-            #         else:
-            #             active_hero = 0
-
-            #     # change player and activate first hero
-            #     if event.key == pygame.K_n:
-            #         play_heroes[active_hero].selected = False
-
-            #         active_hero = 0
-            #         active_player = active_player + 1
-
-            #         if active_player >= 3:
-            #             active_player = 1
-            #         else:
-            #             active_player = 2
-
-            #         if active_player == 1:
-            #             play_heroes = player1.heroes_list
-
-            #         else:
-            #             play_heroes = player2.heroes_list
-
-            #     play_heroes[active_hero].selected = False
-
-            #     if active_player == 1:
-            #         play_heroes = player1.heroes_list
-            #     if active_player == 2:
-            #         play_heroes = player2.heroes_list
-
-            #     play_heroes[active_hero].selected = True
-
-            #     print(f"active player: {active_player}")
-            #     print(f"active hero: {active_hero}")
-
-            #     if event.key == pygame.K_LEFT and not collide_left:
-            #         hero.move_left(PLAYER_VEL)
-            #         player1_steps = player1_steps + 1
-            #     if event.key == pygame.K_RIGHT and not collide_right:
-            #         hero.move_right(PLAYER_VEL)
-            #         player1_steps = player1_steps + 1
-            #     if event.key == pygame.K_UP:
-            #         hero.move_up(PLAYER_VEL)
-            #         player1_steps = player1_steps + 1
-            #     if event.key == pygame.K_DOWN:
-            #         hero.move_down(PLAYER_VEL)
-            #         player1_steps = player1_steps + 1
-
-            #     print(f"player1_steps: {player1_steps}")
-
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_SPACE and player.jump_count < 2:
-            #         player.jump()
 
 
 def main(window):

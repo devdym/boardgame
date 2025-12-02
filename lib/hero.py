@@ -8,7 +8,7 @@ class Hero(pygame.sprite.Sprite):
     ANIMATION_DELAY = 5
     SPRITES = None
 
-    def __init__(self, x, y, width, height, name, direction, selected):
+    def __init__(self, x, y, width, height, name, player, direction, selected):
         super().__init__()
         self.rect = pygame.Rect(x, y, width, height)
         self.x_vel = 0
@@ -21,7 +21,7 @@ class Hero(pygame.sprite.Sprite):
         self.hit = False
         self.hit_count = 0
         self.selected = selected
-        self.name = "hero"
+        self.name = player
 
     def move(self, dx, dy, steps):
         self.rect.x += dx

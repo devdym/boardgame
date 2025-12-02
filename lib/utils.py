@@ -97,7 +97,7 @@ def draw(window, background, bg_image, objects, pl1, pl2, pl1_dash, pl2_dash):
     pygame.display.update()
 
 
-def handle_vertical_collision(hero, objects, dy):
+def handle_vertical_collision(hero, objects, dx, dy):
     collided_objects = []
     for obj in objects:
         if pygame.sprite.collide_mask(hero, obj):
@@ -107,68 +107,120 @@ def handle_vertical_collision(hero, objects, dy):
             elif dy < 0:
                 hero.rect.top = obj.rect.bottom
                 hero.hit_head()
+            if dx > 0:
+                hero.rect.right = obj.rect.left
+                hero.hit_head()
+            elif dx < 0:
+                hero.rect.left = obj.rect.right
+                hero.hit_head()
 
             collided_objects.append(obj)
 
     return collided_objects
 
 
-def collide(hero, player1, player2, dx, dy):
-    hero.move(dx, dy, 500)
+def collide(hero, player1, player2, active_pl, dx, dy):
+    hero.move(dx, dy, 0)
     hero.update()
     collided_object = None
-    for obj in player1.heroes_list:
-        if pygame.sprite.collide_mask(hero, obj):
-            collided_object = obj
-            break
 
-    for obj in player2.heroes_list:
-        if pygame.sprite.collide_mask(hero, obj):
-            collided_object = obj
-            break
+    if active_pl == 2:
+        for obj in player1.heroes_list:
+            if pygame.sprite.collide_mask(hero, obj):
+                collided_object = obj
+                obj.move(10, 10, 10)
+                obj.make_hit()
+                break
+
+    if active_pl == 1:
+        for obj in player2.heroes_list:
+            if pygame.sprite.collide_mask(hero, obj):
+                collided_object = obj
+                obj.move(10, 10, 10)
+                obj.make_hit()
+                break
 
     hero.move(-dx, dy, 500)
     hero.update()
     return collided_object
 
 
-def handle_move(active_player, active_hero, player1, player2, objects, steps_player1):
-    if active_player == 1:
-        play_heroes = player1.heroes_list
-    else:
-        play_heroes = player2.heroes_list
+# def handle_move(active_player, active_hero, player1, player2, objects, steps_player1):
+#     if active_player == 1:
+#         play_heroes = player1.heroes_list
+#     else:
+#         play_heroes = player2.heroes_list
 
-    hero = play_heroes[active_hero]
+#     hero = play_heroes[active_hero]
 
-    keys = pygame.key.get_pressed()
+#     keys = pygame.key.get_pressed()
 
-    hero.x_vel = 0
-    hero.y_vel = 0
-    collide_left = collide(hero, player1, player2, -PLAYER_VEL * 2, 0)
-    collide_right = collide(hero, player1, player2, PLAYER_VEL * 2, 0)
+#     hero.x_vel = 0
+#     hero.y_vel = 0
+#     collide_left = collide(hero, player1, player2, -PLAYER_VEL * 2, 0)
+#     collide_right = collide(hero, player1, player2, PLAYER_VEL * 2, 0)
 
-    if keys[pygame.K_LEFT] and not collide_left:
-        hero.move_left(PLAYER_VEL)
-        steps_player1 = steps_player1 + 1
-    if keys[pygame.K_RIGHT] and not collide_right:
-        hero.move_right(PLAYER_VEL)
-        steps_player1 = steps_player1 + 1
-    if keys[pygame.K_UP]:
-        hero.move_up(PLAYER_VEL)
-        steps_player1 = steps_player1 + 1
-    if keys[pygame.K_DOWN]:
-        hero.move_down(PLAYER_VEL)
-        steps_player1 = steps_player1 + 1
+#     # change hero of same player
+#     if keys[pygame.K_TAB]:
+#         play_heroes[active_hero].selected = False
 
-    print(f"steps_pl1 {steps_player1}")
+#         if active_hero < len(play_heroes) - 1:
+#             active_hero = active_hero + 1
+#         else:
+#             active_hero = 0
 
-    vertical_collide = handle_vertical_collision(hero, objects, hero.y_vel)
-    to_check = [
-        collide_left,
-        collide_right,
-        *vertical_collide,
-    ]
+#     # change player and activate first hero
+#     if keys[pygame.K_n]:
+#         play_heroes[active_hero].selected = False
 
-    for obj in to_check:
-        if obj and obj.name == "block":
-            hero.make_hit()
+#         active_hero = 0
+#         active_player = active_player + 1
+
+#         if active_player >= 3:
+#             active_player = 1
+#         else:
+#             active_player = 2
+
+#         if active_player == 1:
+#             play_heroes = player1.heroes_list
+
+#         else:
+#             play_heroes = player2.heroes_list
+
+#     play_heroes[active_hero].selected = False
+
+#     if active_player == 1:
+#         play_heroes = player1.heroes_list
+#     if active_player == 2:
+#         play_heroes = player2.heroes_list
+
+#     play_heroes[active_hero].selected = True
+
+#     print(f"active player: {active_player}")
+#     print(f"active hero: {active_hero}")
+
+#     if keys[pygame.K_LEFT] and not collide_left:
+#         hero.move_left(PLAYER_VEL)
+#         steps_player1 = steps_player1 + 1
+#     if keys[pygame.K_RIGHT] and not collide_right:
+#         hero.move_right(PLAYER_VEL)
+#         steps_player1 = steps_player1 + 1
+#     if keys[pygame.K_UP]:
+#         hero.move_up(PLAYER_VEL)
+#         steps_player1 = steps_player1 + 1
+#     if keys[pygame.K_DOWN]:
+#         hero.move_down(PLAYER_VEL)
+#         steps_player1 = steps_player1 + 1
+
+#     # print(f"steps_pl1 {steps_player1}")
+
+#     vertical_collide = handle_vertical_collision(hero, objects, hero.y_vel)
+#     to_check = [
+#         collide_left,
+#         collide_right,
+#         *vertical_collide,
+#     ]
+
+#     for obj in to_check:
+#         if obj and obj.name == "block":
+#             hero.make_hit()
