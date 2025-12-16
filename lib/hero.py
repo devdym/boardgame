@@ -22,6 +22,7 @@ class Hero(pygame.sprite.Sprite):
         self.hit_count = 0
         self.selected = selected
         self.name = player
+        self.health = 100
 
     def move(self, dx, dy, steps):
         self.rect.x += dx

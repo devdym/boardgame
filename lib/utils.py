@@ -103,7 +103,8 @@ def handle_vertical_collision(hero, objects, dx, dy):
         if pygame.sprite.collide_mask(hero, obj):
             if dy > 0:
                 hero.rect.bottom = obj.rect.top
-                hero.landed()
+                hero.hit_head()
+                # hero.landed()
             elif dy < 0:
                 hero.rect.top = obj.rect.bottom
                 hero.hit_head()
@@ -139,7 +140,6 @@ def collide(hero, player1, player2, active_pl, dx, dy):
                 obj.move(10, 10, 10)
                 obj.make_hit()
                 break
-
     hero.move(-dx, dy, 500)
     hero.update()
     return collided_object

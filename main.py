@@ -42,12 +42,12 @@ def two_players():
     player1 = Player(
         200, 200, ["Knight", "Bushie", "Alchemist"], "right", "player1", FPS, window
     )
-    player1_steps = 100
+    player1_steps = 200
 
     player2 = Player(
         200, WIDTH - 200, ["Knight", "Puss", "Princes"], "left", "player2", FPS, window
     )
-    # player2_steps = 100
+    player2_steps = 200
 
     health_bar_blue = HealthBar(250, 200, 300, 40, 100)
     shield_bar_blue = HealthBar(250, 200, 300, 40, 100)
@@ -70,11 +70,13 @@ def two_players():
         PL1_HP_Rect.center = (100, 30)
         # health_bar_blue.draw(window)
 
-        PL1_SHIELD = get_font(20).render("SHIELD 100", True, "#404eb6")
+        PL1_SHIELD = get_font(20).render(
+            f"HEALTH {player1.heroes_list[active_hero].health}", True, "#404eb6"
+        )
         PL1_SHIELD_Rect = PL1_SHIELD.get_rect()
         PL1_SHIELD_Rect.center = (100, 60)
 
-        PL1_ATK = get_font(20).render("ATTACK 17", True, "#404eb6")
+        PL1_ATK = get_font(20).render(f"STEPS {player1_steps}", True, "#404eb6")
         PL1_ATK_rect = PL1_ATK.get_rect()
         PL1_ATK_rect.center = (100, 90)
 
@@ -88,11 +90,13 @@ def two_players():
         PL2_HP_Rect = PL2_HP.get_rect()
         PL2_HP_Rect.center = (1000, 30)
 
-        PL2_SHIELD = get_font(20).render("SHIELD 100", True, "#e04b1e")
+        PL2_SHIELD = get_font(20).render(
+            f"HEALTH {player1.heroes_list[active_hero].health}", True, "#e04b1e"
+        )
         PL2_SHIELD_Rect = PL2_SHIELD.get_rect()
         PL2_SHIELD_Rect.center = (1000, 60)
 
-        PL2_ATK = get_font(20).render("ATTACK 17", True, "#e04b1e")
+        PL2_ATK = get_font(20).render(f"STEPS {player2_steps}", True, "#e04b1e")
         PL2_ATK_rect = PL2_ATK.get_rect()
         PL2_ATK_rect.center = (1000, 90)
 
@@ -156,6 +160,7 @@ def two_players():
 
         # change player and activate first hero
         if keys[pygame.K_n]:
+            player1_steps = 200
             play_heroes[active_hero].selected = False
 
             active_hero = 0
@@ -185,17 +190,36 @@ def two_players():
         print(f"active hero: {active_hero}")
 
         if keys[pygame.K_LEFT] and not collide_left:
-            hero.move_left(PLAYER_VEL)
-            player1_steps = player1_steps + 1
+            if active_player == 1 and player1_steps > 0:
+                hero.move_left(PLAYER_VEL)
+                player1_steps = player1_steps - 1
+            if active_player == 2 and player2_steps > 0:
+                hero.move_left(PLAYER_VEL)
+                player2_steps = player2_steps - 1
+
         if keys[pygame.K_RIGHT] and not collide_right:
-            hero.move_right(PLAYER_VEL)
-            player1_steps = player1_steps + 1
+            if active_player == 1 and player1_steps > 0:
+                hero.move_right(PLAYER_VEL)
+                player1_steps = player1_steps - 1
+            if active_player == 2 and player2_steps > 0:
+                hero.move_right(PLAYER_VEL)
+                player2_steps = player2_steps - 1
+
         if keys[pygame.K_UP]:
-            hero.move_up(PLAYER_VEL)
-            player1_steps = player1_steps + 1
+            if active_player == 1 and player1_steps > 0:
+                hero.move_up(PLAYER_VEL)
+                player1_steps = player1_steps - 1
+            if active_player == 2 and player2_steps > 0:
+                hero.move_up(PLAYER_VEL)
+                player2_steps = player2_steps - 1
+
         if keys[pygame.K_DOWN]:
-            hero.move_down(PLAYER_VEL)
-            player1_steps = player1_steps + 1
+            if active_player == 1 and player1_steps > 0:
+                hero.move_down(PLAYER_VEL)
+                player1_steps = player1_steps - 1
+            if active_player == 2 and player2_steps > 0:
+                hero.move_down(PLAYER_VEL)
+                player2_steps = player2_steps - 1
 
         print(f"player1_steps: {player1_steps}")
 
@@ -211,7 +235,7 @@ def two_players():
         for obj in to_check:
             if obj and obj.name == "player1":
                 hero.make_hit()
-
+                player1.heroes_list[active_hero].health -= 10
                 # hero.move(10, 10, 10)
 
         # if event.type == pygame.KEYDOWN:
